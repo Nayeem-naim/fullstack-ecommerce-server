@@ -57,7 +57,7 @@ client.connect(err => {const orderCollection = client.db("volunteer").collection
       res.send(result.insertedCount > 0)
     })
   })
-  
+
   app.get('/order',(req,res) => {
     orderCollection.find({email: req.query.email})
     .toArray((err,data)=> {
@@ -66,4 +66,4 @@ client.connect(err => {const orderCollection = client.db("volunteer").collection
   })
 });
 
-app.listen(port)
+app.listen(process.env.PORT || port)
