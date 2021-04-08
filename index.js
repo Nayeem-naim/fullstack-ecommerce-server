@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 
-const port = process.env.PORT || 5055; 
+const port = process.env.PORT || 5055;
 
 app.use(cors());
 app.use(bodyParser.json())
@@ -22,14 +22,48 @@ console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect(err => {
-    console.log('database error', err);
-  const eventCollection = client.db("volunteer").collection("event");
-console.log('Database connection successfully');
-//   client.close();
+  console.log('database error', err);
+  const productCollection = client.db("volunteer").collection("event");
+
+ app.get('/product' , (req, res ) => {
+   productCollection.find()
+   .toArray((err, items) => {
+      res.send(items)
+   })
+ })
+
+ const ObjectID = require('mongodb').ObjectID
+ app.delete('/deleteProduct/:id',(req,res)=>{
+  const id=ObjectID(req.params.id);
+  console.log('delete this');
+  productCollection.deleteOne({_id: id})
+  .then((err,documents)=>res.send(documents))
+})
+
+
+  app.post('/addProduct', (req, res) => {
+    const newProduct = req.body;
+    productCollection.insertOne(newProduct)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+  })
+});
+client.connect(err => {const orderCollection = client.db("volunteer").collection("order");
+  app.post('/addOrder', (req, res) => {
+    const newOrder = req.body;
+    orderCollection.insertOne(newOrder)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+  })
+  
+  app.get('/order',(req,res) => {
+    orderCollection.find({email: req.query.email})
+    .toArray((err,data)=> {
+      res.send(data)
+    })
+  })
 });
 
-
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+app.listen(port)
