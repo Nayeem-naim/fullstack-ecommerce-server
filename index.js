@@ -18,13 +18,10 @@ app.get('/', (req, res) => {
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.n2xq8.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect(err => {
-  console.log('database error', err);
   const productCollection = client.db("volunteer").collection("event");
-
  app.get('/product' , (req, res ) => {
    productCollection.find()
    .toArray((err, items) => {
@@ -35,7 +32,6 @@ client.connect(err => {
  const ObjectID = require('mongodb').ObjectID
  app.delete('/deleteProduct/:id',(req,res)=>{
   const id=ObjectID(req.params.id);
-  console.log('delete this');
   productCollection.deleteOne({_id: id})
   .then((err,documents)=>res.send(documents))
 })
